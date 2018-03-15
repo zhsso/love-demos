@@ -150,7 +150,7 @@ local function calcOutterLine()
         p4.next = {{point = p1, line = { p4, p1} }}
         p4.line = {p4, p1}
 
-        
+
         p1.pre = {p4}
         p2.pre = {p1}
         p3.pre = {p2}
@@ -161,7 +161,7 @@ local function calcOutterLine()
         points[#points + 1] = p3
         points[#points + 1] = p4
     end
-    
+
     for i = 1, #points, 1 do
         local pi = points[i]
         for j = i + 1, #points, 1 do
@@ -183,14 +183,14 @@ local function calcOutterLine()
             table.sort(point.altNext, function(a, b)
                 return calcDistance(a, point) < calcDistance(b, point)
             end)
-                
+
             local nextP = point.next[1].point
             local anchor = point
 
             nextP.pre = {point.altNext[#point.altNext]}
 
             anchor.next = {}
-            
+
             for _, p in ipairs(point.altNext) do
                 anchor.next[#anchor.next + 1] = {point = p, line = point.line}
                 p.pre[#p.pre + 1] = anchor
@@ -207,23 +207,23 @@ local function calcOutterLine()
     end)
 
     local beginP = points[1]
-    
+
     local anchor = beginP
     local preP = beginP.pre[1]
-    
+
     while not anchor.isCalc do
         table.sort(anchor.next, function(a, b)
             local aa = getRotateAngle(preP.next[1].line, a.line)
             local ab = getRotateAngle(preP.next[1].line, b.line)
             return aa > ab
         end)
-        
+
         anchor.next[1].point.pre[1] = anchor
         anchor.isCalc = true
         preP = anchor
         anchor = anchor.next[1].point
     end
-    
+
 
     local drawCnt = 1
     anchor = beginP
@@ -240,7 +240,7 @@ local function calcOutterLine()
         anchor.isDraw = true
         anchor = anchor.next[1].point
     end
-    
+
     if step > drawCnt then
         step = drawCnt
     end
@@ -258,8 +258,10 @@ function love.update(dt)
     local rect = rects[selectedRect]
     if rect then
 	rect.x = rect.x + speed.x
-	rect.y = rect.y + speed.y
-	step = 100
+    rect.y = rect.y + speed.y
+    if math.abs(speed.x) + math.abs(speed.y) > keyMoveSpeed/2 then
+        step = 100
+    end
     end
 end
 
@@ -279,7 +281,7 @@ function love.keypressed(k)
     elseif k == "i" then
         showInfo = not showInfo
     end
-        
+
     if k == "w" then
 	    speed = {x = 0, y = -keyMoveSpeed}
         step = 100
